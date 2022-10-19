@@ -1,5 +1,5 @@
+require('dotenv/config');
 const { Client, GatewayIntentBits } = require('discord.js')
-const config = require('./config');
 
 const channels = {
     qa: '1032309212149186610',
@@ -12,7 +12,7 @@ const bot = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 })
 
-bot.login(config.token)
+bot.login(process.env.DCTOKEN)
 
 bot.on('ready', () => {
     console.log('Alpinho está pronto!');

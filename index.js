@@ -50,15 +50,15 @@ const newEmbed = (title, description) => ({
 const actions = [
     {
         keywords: ['merge request', 'opened'],
-        title: ({ author }) => `${author} criou um novo Merge Request!`
+        title: ({ author }) => `${author.name} criou um novo Merge Request!`
     },
     {
         keywords: ['merge request', ' approved'],
-        title: ({ author }) => `${author} aprovou um Merge Request!`
+        title: ({ author }) => `${author.name} aprovou um Merge Request!`
     },
     {
         keywords: ['merge request', 'unapproved'],
-        title: ({ author }) => `${author} desaprovou um Merge Request!`
+        title: ({ author }) => `${author.name} desaprovou um Merge Request!`
     },
     {
         keywords: ['Pipeline', 'passed'],
@@ -77,6 +77,7 @@ const actions = [
 
 bot.on('messageCreate', async (message) => {
     const { channelId, content } = message;
+    console.log(message.embeds[0].data)
     const { author, description } = message.embeds[0].data
     if (channelId === channels.frontLogs) {
         actions.map(item => {
@@ -87,7 +88,7 @@ bot.on('messageCreate', async (message) => {
 
             if (matchKeywords === 1) {
                 const logChannel = bot.channels.cache.get(channels.frontResults)
-                const title = item.title(message.embeds[0])
+                const title = item.title(message.embeds[0].data)
                 logChannel.send(newEmbed(title, description))
                 if (item.alias) item.alias(title, description)
             }

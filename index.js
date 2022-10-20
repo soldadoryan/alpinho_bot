@@ -34,7 +34,7 @@ const branchesObj = (description) => {
         return true
     })
 
-    return currentBranch
+    return currentBranch ?? 'uma branch'
 }
 
 const newEmbed = (title, description) => ({
@@ -62,7 +62,7 @@ const actions = [
     },
     {
         keywords: ['Pipeline', 'passed'],
-        title: ({ description }) => `Uma nova versão está disponível em "${branchesObj(description).label}!"`,
+        title: ({ description }) => `Uma nova versão está disponível em ${branchesObj(description).label}!`,
         alias: (description) => {
             const currentBranch = branchesObj(description)
             const branchChannel = bot.channels.cache.get(currentBranch.channel)
@@ -71,7 +71,7 @@ const actions = [
     },
     {
         keywords: ['Pipeline', 'failed'],
-        title: ({ description }) => `Uma falha ocorreu ao subir uma nova versão em "${branchesObj(description).label}!"`,
+        title: ({ description }) => `Uma falha ocorreu ao subir uma nova versão em ${branchesObj(description).label}!`,
     },
 ]
 

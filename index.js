@@ -1,5 +1,5 @@
-require('dotenv/config');
-const { Client, GatewayIntentBits } = require('discord.js')
+import 'dotenv/config'
+import { Client, GatewayIntentBits } from 'discord.js'
 
 const channels = {
     qa: '1032309212149186610',

@@ -34,7 +34,7 @@ const branchesObj = (description) => {
         return true
     })
 
-    return currentBranch ?? 'uma branch'
+    return currentBranch ?? { label: 'uma branch', channel: channels.frontResults }
 }
 
 const newEmbed = (title, description) => ({
@@ -66,7 +66,7 @@ const actions = [
         alias: (description) => {
             const currentBranch = branchesObj(description)
             const branchChannel = bot.channels.cache.get(currentBranch.channel)
-            branchChannel.send(newEmbed())
+            branchChannel.send(newEmbed(`Uma nova versão está disponível em ${currentBranch.label}!`,description))
         }
     },
     {
@@ -90,7 +90,7 @@ bot.on('messageCreate', async (message) => {
                 const logChannel = bot.channels.cache.get(channels.frontResults)
                 const title = item.title(message.embeds[0].data)
                 logChannel.send(newEmbed(title, description))
-                if (item.alias) item.alias(title, description)
+                if (item.alias) item.alias(description)
             }
         })
     }

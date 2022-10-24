@@ -9,13 +9,14 @@ const channels = {
 }
 
 const bot = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers]
 })
 
 bot.login(process.env.DCTOKEN)
 
 bot.on('ready', () => {
     console.log('Alpinho está pronto!');
+    // console.log(bot.guilds.cache.first().members.cache.map(({user})=>({id:user.id, username:user.username})));
 })
 
 const branchesObj = (description) => {
@@ -23,6 +24,16 @@ const branchesObj = (description) => {
         { label: 'master', channel: channels.management },
         { label: 'homolog', channel: channels.management },
         { label: 'develop', channel: channels.qa },
+    ]
+    const roles =[
+     { id: '994681551948365824', name: '@everyone' },
+     { id: '1017859182860447766', name: 'frontend' },
+     { id: '1017859348027932813', name: 'backend' },
+     { id: '1017859574696513607', name: 'negócio' },
+     { id: '1017859858516689077', name: 'qa' },
+     { id: '1024024621625901086', name: 'designer' },
+      { id: '1024376815172730900', name: 'admin' },
+      { id: '1031988401576099985', name: 'Alpinho' }
     ]
 
     let currentBranch = {};
@@ -33,8 +44,9 @@ const branchesObj = (description) => {
         }
         return true
     })
+ const isNotEmpty = !!Object.keys(currentBranch).length
 
-    return currentBranch ?? { label: 'uma branch', channel: channels.frontResults }
+    return isNotEmpty ? currentBranch : { label: 'uma branch', channel: channels.frontResults }
 }
 
 const newEmbed = (title, description) => ({
@@ -46,19 +58,31 @@ const newEmbed = (title, description) => ({
         }
     }]
 })
+const embedWithoutNotification = (title, description) => ({
+    content: `\n`, embeds: [{
+        title,
+        description,
+        thumbnail: {
+            url: 'https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png'
+        }
+    }]
+})
 
 const actions = [
     {
         keywords: ['merge request', 'opened'],
-        title: ({ author }) => `${author.name} criou um novo Merge Request!`
+        title: ({ author }) => `${author.name} criou um novo Merge Request!`,
+        sendNotification: true
     },
     {
         keywords: ['merge request', ' approved'],
-        title: ({ author }) => `${author.name} aprovou um Merge Request!`
+        title: ({ author }) => `${author.name} aprovou um Merge Request!`,
+        sendNotification: false
     },
     {
         keywords: ['merge request', 'unapproved'],
-        title: ({ author }) => `${author.name} desaprovou um Merge Request!`
+        title: ({ author }) => `${author.name} desaprovou um Merge Request!`,
+        sendNotification: false
     },
     {
         keywords: ['Pipeline', 'passed'],
@@ -66,16 +90,21 @@ const actions = [
         alias: (description) => {
             const currentBranch = branchesObj(description)
             const branchChannel = bot.channels.cache.get(currentBranch.channel)
-            branchChannel.send(newEmbed(`Uma nova versão está disponível em ${currentBranch.label}!`,description))
+            if(currentBranch.label === 'uma branch'){
+                branchChannel.send(embedWithoutNotification(`Uma nova versão está disponível em ${currentBranch.label}!`,description))
+            }else{
+                branchChannel.send(newEmbed(`Uma nova versão está disponível em ${currentBranch.label}!`,description))
+            }
         }
     },
     {
         keywords: ['Pipeline', 'failed'],
-        title: ({ description }) => `Uma falha ocorreu ao subir uma nova versão em ${branchesObj(description).label}!`,
+        title: ({ description }) => `Uma falha ocorreu ao subir uma nova versão em ${branchesObj(description).label}!`,        
+        sendNotification: true
     },
 ]
 
-bot.on('messageCreate', async (message) => {
+bot.on('messageCreate', async (message) => {  
     const { channelId, content } = message;
     console.log(message.embeds[0].data)
     const { author, description } = message.embeds[0].data
@@ -89,7 +118,13 @@ bot.on('messageCreate', async (message) => {
             if (matchKeywords === 1) {
                 const logChannel = bot.channels.cache.get(channels.frontResults)
                 const title = item.title(message.embeds[0].data)
-                logChannel.send(newEmbed(title, description))
+                if (!item.alias){
+                    if(item.sendNotification){
+                        logChannel.send(newEmbed(title, description))
+                    }else{
+                        logChannel.send(embedWithoutNotification(title, description))
+                    }
+                }
                 if (item.alias) item.alias(description)
             }
         })

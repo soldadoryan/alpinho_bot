@@ -106,6 +106,8 @@ const actions = [
 
 bot.on('messageCreate', async (message) => {  
     const { channelId, content } = message;
+    
+    if(message.embeds.length){    
     console.log(message.embeds[0].data)
     const { author, description } = message.embeds[0].data
     if (channelId === channels.frontLogs) {
@@ -129,4 +131,5 @@ bot.on('messageCreate', async (message) => {
             }
         })
     }
+}
 })

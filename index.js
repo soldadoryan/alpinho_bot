@@ -27,7 +27,7 @@ const branchesObj = (description) => {
   const branches = [
     { label: "master", channels: [channels.management] },
     { label: "homolog", channels: [channels.management, channels.qa] },
-    { label: "develop", channels: [] },
+    { label: "develop", channels: [channels.frontResults] },
   ];
   const roles = [
     { id: "994681551948365824", name: "@everyone" },

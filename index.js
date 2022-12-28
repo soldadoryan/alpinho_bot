@@ -52,7 +52,7 @@ const branchesObj = (description) => {
 
   return isNotEmpty
     ? currentBranch
-    : { label: "uma branch", channel: channels.frontResults };
+    : { label: "uma branch", channels: [channels.frontResults] };
 };
 
 const newEmbed = (title, description) => ({
@@ -136,7 +136,6 @@ bot.on("messageCreate", async (message) => {
   const { channelId, content } = message;
 
   if (message.embeds.length) {
-    console.log(message.embeds[0].data);
     const { author, description } = message.embeds[0].data;
     if (channelId === channels.frontLogs) {
       actions.map((item) => {

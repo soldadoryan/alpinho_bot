@@ -52,7 +52,7 @@ const branchesObj = (description) => {
 
   return isNotEmpty
     ? currentBranch
-    : { label: "uma branch", channel: channels.frontResults };
+    : { label: "uma branch", channels: [channels.frontResults] };
 };
 
 const newEmbed = (title, description) => ({
@@ -103,7 +103,7 @@ const actions = [
     alias: (description) => {
       const currentBranch = branchesObj(description);
       currentBranch.channels.map((channel) => {
-        const branchChannel = bot.channels.cache.get(currentBranch.channel);
+        const branchChannel = bot.channels.cache.get(channel);
         if (currentBranch.label === "uma branch") {
           branchChannel.send(
             embedWithoutNotification(

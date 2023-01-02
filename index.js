@@ -52,7 +52,7 @@ const branchesObj = (description) => {
 
   return isNotEmpty
     ? currentBranch
-    : { label: "uma branch", channels: [channels.frontResults] };
+    : { label: "uma branch", channel: channels.frontResults };
 };
 
 const newEmbed = (title, description) => ({
